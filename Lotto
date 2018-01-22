@@ -6,15 +6,15 @@ OpenSource drawing lots in purpose of learning smart contracts */
 /* To draw lots*/
 contract TDL {
 
+	uint64 public ticketPrice = 1;
+	uint private jackpot;
+	uint public tickets_sold;
+
 	struct Player {
 		uint ticketsBought;
 	}
 
-	uint64 public ticketPrice = 1;
-
-	uint private balance;
- 
-	address public player;
+	mapping(address => Player) public players;
 
 	event LogPaymentMade(address accountAddress, uint amount);
 
@@ -23,16 +23,17 @@ contract TDL {
 	}
 
 	function buyTicket() public returns (uint) {
-		if (msg.value > ticketPrice) {
-			uint howManyTickets = msg.value/ticketPrice;
-			balance += msg.value;
-			LogPaymentMade(msg.sender, msg.value);
-			return howManyTickets;
-		}
-		return (uint)0;
+		require (msg.value > ticketPrice);
+
+		uint howManyTickets = msg.value/ticketPrice;
+		uint realPrize = howManyTickets * ticketPrice;
+		jackpot += msg.value;
+		LogPaymentMade(msg.sender, msg.value);
+		return howManyTickets;
+		
 	}
 
-	function balance() constant returns (uint) {
+	function jackpot() constant returns (uint) {
 		return balances[msg.sender];
 	}
 }
