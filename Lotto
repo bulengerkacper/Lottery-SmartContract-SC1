@@ -37,4 +37,8 @@ contract TDL {
 	function jackpot() constant returns (uint) {
 		return balances[msg.sender];
 	}
+
+	function sendMoneyToWinner () payable {
+		winner.send(jackpot);
+	}
 }
