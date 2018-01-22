@@ -1,0 +1,38 @@
+pragma solidity ^0.4.19;
+
+/* author @BulKac
+OpenSource drawing lots in purpose of learning smart contracts */
+
+/* To draw lots*/
+contract TDL {
+
+	struct Player {
+		uint ticketsBought;
+	}
+
+	uint64 public ticketPrice = 1;
+
+	uint private balance;
+ 
+	address public player;
+
+	event LogPaymentMade(address accountAddress, uint amount);
+
+	function TDL() {
+		player = msg.sender;
+	}
+
+	function buyTicket() public returns (uint) {
+		if (msg.value > ticketPrice) {
+			uint howManyTickets = msg.value/ticketPrice;
+			balance += msg.value;
+			LogPaymentMade(msg.sender, msg.value);
+			return howManyTickets;
+		}
+		return (uint)0;
+	}
+
+	function balance() constant returns (uint) {
+		return balances[msg.sender];
+	}
+}
