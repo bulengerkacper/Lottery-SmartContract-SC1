@@ -17,7 +17,7 @@ contract TDL {
 	event playerCharged(address accountAddres, uint chargedMoney);
 
 	function TDL() {
-		players = new address[];
+		
 	}
 
 	function buyTicket() public returns (uint) {
@@ -31,22 +31,26 @@ contract TDL {
 		jackpot += realPrize;
 		playerCharged(msg.sender, realPrize);
 		msg.sender.transfer(msg.value-realPrize);
-		tickets_sold += howManyTickets;
+		ticketsSold += howManyTickets;
 		return howManyTickets;
 		
 	}
 
+    function random() private view returns (uint) {
+        return uint(keccak256(block.difficulty, now, players));
+    }
+
 	function getJackpot() constant returns (uint) {
-		return balances[msg.sender];
+		return jackpot;
 	}
 
-	function getTicketsSold() public returns (uint) {
+	function getTicketSold() public returns (uint) {
 		return ticketsSold;
 	}
 
 	function sendMoneyToWinnerEndLottery () payable {
 	 	uint index = random() % players.length;
-	 	LotteryWinnerSet(players[index], jackpotAmount);
+	 	LotteryWinnerSet(players[index], jackpot);
 		players[index].send(jackpot);
 		delete players;
 	}
