@@ -8,7 +8,7 @@ contract TDL {
 
 	uint64 public ticketPrize = 1;
 	uint private jackpot;
-	uint public tickets_sold;
+	uint public ticketsSold;
 
 	addres[] public players;
 
@@ -17,14 +17,13 @@ contract TDL {
 	event playerCharged(addres accountAddres, uint chargedMoney);
 
 	function TDL() {
-		player = msg.sender;
+		players = new addres[];
 	}
 
 	function buyTicket() public returns (uint) {
 		require (msg.value > ticketPrize);
 	
-			uint howManyTickets = msg.value/ticketPrize;
-
+		uint howManyTickets = msg.value/ticketPrize;
 		for(uint counter = 0; counter < howManyTickets; counter++) {
 			players.push(msg.sender);
 		}
@@ -33,7 +32,6 @@ contract TDL {
 		playerCharged(msg.sender, realPrize);
 		msg.sender.transfer(msg.value-realPrize);
 		tickets_sold += howManyTickets;
-		delete players; // ?? pytanie co w kolejnej turze
 		return howManyTickets;
 		
 	}
@@ -42,9 +40,14 @@ contract TDL {
 		return balances[msg.sender];
 	}
 
+	function ticketSold() public returns (uint) {
+		return ticketsSold;
+	}
+
 	function sendMoneyToWinnerEndLottery () payable {
 	 	uint index = random() % players.length;
 	 	event LotteryWinnerSet(players[index], uint jackpotAmount);
 		players[index].send(jackpot);
+		delete players;
 	}
 }
