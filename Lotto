@@ -10,14 +10,14 @@ contract TDL {
 	uint private jackpot;
 	uint public ticketsSold;
 
-	addres[] public players;
+	address[] public players;
 
 	event TicketsBought(address accountAddress, uint amount);
 	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
-	event playerCharged(addres accountAddres, uint chargedMoney);
+	event playerCharged(address accountAddres, uint chargedMoney);
 
 	function TDL() {
-		players = new addres[];
+		players = new address[];
 	}
 
 	function buyTicket() public returns (uint) {
@@ -36,17 +36,17 @@ contract TDL {
 		
 	}
 
-	function jackpot() constant returns (uint) {
+	function getJackpot() constant returns (uint) {
 		return balances[msg.sender];
 	}
 
-	function ticketSold() public returns (uint) {
+	function getTicketsSold() public returns (uint) {
 		return ticketsSold;
 	}
 
 	function sendMoneyToWinnerEndLottery () payable {
 	 	uint index = random() % players.length;
-	 	event LotteryWinnerSet(players[index], uint jackpotAmount);
+	 	LotteryWinnerSet(players[index], jackpotAmount);
 		players[index].send(jackpot);
 		delete players;
 	}
