@@ -10,13 +10,11 @@ contract TDL {
 	uint private jackpot;
 	uint public tickets_sold;
 
-	struct Player {
-		uint ticketsBought;
-	}
+	addres[] public players;
 
-	mapping(address => Player) public players;
-
-	event LogPaymentMade(address accountAddress, uint amount);
+	event TicketsBought(address accountAddress, uint amount);
+	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
+	event playerCharged(addres accountAddres, uint chargedMoney);
 
 	function TDL() {
 		player = msg.sender;
@@ -24,12 +22,18 @@ contract TDL {
 
 	function buyTicket() public returns (uint) {
 		require (msg.value > ticketPrize);
+	
+			uint howManyTickets = msg.value/ticketPrize;
 
-		uint howManyTickets = msg.value/ticketPrize;
+		for(uint counter = 0; counter < howManyTickets; counter++) {
+			players.push(msg.sender);
+		}
 		uint realPrize = howManyTickets * ticketPrize;
-		jackpot += msg.value;
-		LogPaymentMade(msg.sender, msg.value);
+		jackpot += realPrize;
+		playerCharged(msg.sender, realPrize);
 		msg.sender.transfer(msg.value-realPrize);
+		tickets_sold += howManyTickets;
+		delete players; // ?? pytanie co w kolejnej turze
 		return howManyTickets;
 		
 	}
@@ -38,7 +42,9 @@ contract TDL {
 		return balances[msg.sender];
 	}
 
-	function sendMoneyToWinner () payable {
-		winner.send(jackpot);
+	function sendMoneyToWinnerEndLottery () payable {
+	 	uint index = random() % players.length;
+	 	event LotteryWinnerSet(players[index], uint jackpotAmount);
+		players[index].send(jackpot);
 	}
 }
