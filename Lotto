@@ -2,7 +2,11 @@ pragma solidity ^0.4.19;
 
 /* author @BulKac
 OpenSource drawing lots in purpose of learning smart contracts 
-4 days smart Lottery	*/
+4 days smart Lottery
+
+@For next days:
+1) Now it's not 'now' time -> find sth else
+	*/
 
 /* To draw lots*/
 contract TDL {
@@ -22,7 +26,7 @@ contract TDL {
 		ticketPrize = _ticketPrize;
 	}
 
-	function buyTicket() public returns (uint) {
+	function buyTicket() public payable returns (uint) {
 		require (now <= lotteryEndTime);
 		require (msg.value > ticketPrize);
 	
@@ -51,13 +55,12 @@ contract TDL {
 		return ticketsSold;
 	}
 
-	function sendMoneyToWinnerEndLottery () payable {
+	function endLottery () public payable {
 		require (now > lotteryEndTime);
 	 	uint index = random() % players.length;
 	 	LotteryWinnerSet(players[index], jackpot);
 		if(players[index].send(jackpot)) {
 		} else {
-			//throw; @deprecated
 			revert();
 		}
 	}
