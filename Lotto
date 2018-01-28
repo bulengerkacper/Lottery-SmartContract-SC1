@@ -2,11 +2,7 @@ pragma solidity ^0.4.19;
 
 /* author @BulKac
 OpenSource drawing lots in purpose of learning smart contracts 
-4 days smart Lottery
-
-@For next days:
-1) Now it's not 'now' time -> find sth else
-	*/
+4 days smart Lottery */
 
 /* To draw lots*/
 contract TDL {
@@ -40,11 +36,10 @@ contract TDL {
 		msg.sender.transfer(msg.value-realPrize);
 		ticketsSold += howManyTickets;
 		return howManyTickets;
-		
 	}
 
 	function random() private view returns (uint) {
-	    return uint(keccak256(block.difficulty, now, players));
+		return uint(keccak256(block.difficulty, now, players));
 	}
 
 	function getJackpot() public constant returns (uint) {
