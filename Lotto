@@ -17,7 +17,7 @@ contract TDL {
 	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
 	event playerReCharged(address accountAddres, uint chargedMoney);
 
-	function TDL(uint _whenEnd, _ticketPrize) public {
+	function TDL(uint _whenEnd, uint64 _ticketPrize) public {
 		lotteryEndTime = now + _whenEnd;
 		ticketPrize = _ticketPrize;
 	}
@@ -43,11 +43,11 @@ contract TDL {
 	    return uint(keccak256(block.difficulty, now, players));
 	}
 
-	function getJackpot() constant returns (uint) {
+	function getJackpot() public constant returns (uint) {
 		return jackpot;
 	}
 
-	function getTicketSold() public returns (uint) {
+	function getTicketSold() public constant returns (uint) {
 		return ticketsSold;
 	}
 
@@ -55,10 +55,10 @@ contract TDL {
 		require (now > lotteryEndTime);
 	 	uint index = random() % players.length;
 	 	LotteryWinnerSet(players[index], jackpot);
-		if(players[index].transfer(jackpot)) {
-
+		if(players[index].send(jackpot)) {
 		} else {
-			throw;
+			//throw; @deprecated
+			revert();
 		}
 	}
 }
