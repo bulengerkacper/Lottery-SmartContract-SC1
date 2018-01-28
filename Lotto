@@ -1,7 +1,8 @@
 pragma solidity ^0.4.19;
 
 /* author @BulKac
-OpenSource drawing lots in purpose of learning smart contracts */
+OpenSource drawing lots in purpose of learning smart contracts 
+4 days smart Lottery	*/
 
 /* To draw lots*/
 contract TDL {
@@ -9,7 +10,7 @@ contract TDL {
 	uint64 public ticketPrize = 1;
 	uint private jackpot;
 	uint public ticketsSold;
-
+	uint public lotteryEndTime = now + 172800;
 	address[] public players;
 
 	event TicketsBought(address accountAddress, uint amount);
@@ -21,6 +22,7 @@ contract TDL {
 	}
 
 	function buyTicket() public returns (uint) {
+		require (now <= lotteryEndTime);
 		require (msg.value > ticketPrize);
 	
 		uint howManyTickets = msg.value/ticketPrize;
@@ -36,9 +38,9 @@ contract TDL {
 		
 	}
 
-    function random() private view returns (uint) {
-        return uint(keccak256(block.difficulty, now, players));
-    }
+	function random() private view returns (uint) {
+	    return uint(keccak256(block.difficulty, now, players));
+	}
 
 	function getJackpot() constant returns (uint) {
 		return jackpot;
@@ -49,9 +51,12 @@ contract TDL {
 	}
 
 	function sendMoneyToWinnerEndLottery () payable {
+		require (now > lotteryEndTime);
 	 	uint index = random() % players.length;
 	 	LotteryWinnerSet(players[index], jackpot);
-		players[index].send(jackpot);
+		if(players[index].send(jackpot)) {
+
+		}
 		delete players;
 	}
 }
