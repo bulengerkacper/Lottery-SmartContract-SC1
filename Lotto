@@ -7,18 +7,19 @@ OpenSource drawing lots in purpose of learning smart contracts
 /* To draw lots*/
 contract TDL {
 
-	uint64 public ticketPrize = 1;
+	uint64 public ticketPrize;
 	uint private jackpot;
 	uint public ticketsSold;
-	uint public lotteryEndTime = now + 172800;
+	uint public lotteryEndTime;
 	address[] public players;
 
 	event TicketsBought(address accountAddress, uint amount);
 	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
 	event playerCharged(address accountAddres, uint chargedMoney);
 
-	function TDL() {
-		
+	function TDL(uint _whenEnd, _ticketPrize) public {
+		lotteryEndTime = now + _whenEnd;
+		ticketPrize = _ticketPrize;
 	}
 
 	function buyTicket() public returns (uint) {
@@ -57,6 +58,5 @@ contract TDL {
 		if(players[index].send(jackpot)) {
 
 		}
-		delete players;
 	}
 }
