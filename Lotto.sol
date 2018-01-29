@@ -17,7 +17,7 @@ contract TDL {
 	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
 	event playerReCharged(address accountAddres, uint chargedMoney);
 
-	function TDL(uint _whenEnd, uint64 _ticketPrize) public {
+	function TDL(uint _whenEnd, uint64 _ticketPrize) public payable {
 		lotteryEndTime = now + _whenEnd;
 		ticketPrize = _ticketPrize;
 	}
