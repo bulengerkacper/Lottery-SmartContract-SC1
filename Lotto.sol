@@ -24,7 +24,7 @@ contract TDL {
 
 	function buyTicket() public payable returns (uint) {
 		require (now <= lotteryEndTime);
-		require (msg.value > ticketPrize);
+		require (msg.value >= ticketPrize);
 	
 		uint howManyTickets = msg.value/ticketPrize;
 		for(uint counter = 0; counter < howManyTickets; counter++) {
