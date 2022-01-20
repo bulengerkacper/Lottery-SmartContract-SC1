@@ -32,13 +32,14 @@ contract TDL {
        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players.length)));
 	}
 
-	function endLottery () public payable {
+    function getJackpot() public view returns (uint) {
+        return address(this).balance;
+    }
+
+	function endLottery () public{
 		require (block.timestamp > lotteryEndTime);
 	 	uint index = random() % players.length;
+        players[index].transfer(address(this).balance);
 	 	emit LotteryWinnerSet(players[index], jackpot);
-		if(players[index].send(jackpot)) {
-		} else {
-			revert();
-		}
 	}
 }
