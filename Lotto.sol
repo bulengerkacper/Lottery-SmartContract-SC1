@@ -1,8 +1,5 @@
-pragma solidity ^0.4.19;
-
-/* author @BulKac
-OpenSource drawing lots in purpose of learning smart contracts 
-4 days smart Lottery */
+pragma solidity ^0.8.11;
+//SPDX-License-Identifier: GPL-3.0
 
 /* To draw lots*/
 contract TDL {
@@ -11,49 +8,46 @@ contract TDL {
 	uint private jackpot;
 	uint public ticketsSold;
 	uint public lotteryEndTime;
-	address[] public players;
+	address payable[] public players;
+    address public owner;
 
-	event TicketsBought(address accountAddress, uint amount);
 	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
-	event playerReCharged(address accountAddres, uint chargedMoney);
 
-	function TDL(uint _whenEnd, uint64 _ticketPrize) public payable {
-		lotteryEndTime = now + _whenEnd;
+	constructor(uint _whenEnd, uint64 _ticketPrize) {
+		lotteryEndTime = block.timestamp + _whenEnd;
 		ticketPrize = _ticketPrize;
+        owner=msg.sender;
 	}
 
 	function buyTicket() public payable returns (uint) {
-		require (now <= lotteryEndTime);
+		require (block.timestamp <= lotteryEndTime);
 		require (msg.value >= ticketPrize);
 	
 		uint howManyTickets = msg.value/ticketPrize;
 		for(uint counter = 0; counter < howManyTickets; counter++) {
-			players.push(msg.sender);
+			players.push(payable(msg.sender));
 		}
-		uint realPrize = howManyTickets * ticketPrize;
-		jackpot += realPrize;
-		playerReCharged(msg.sender, realPrize);
-		msg.sender.transfer(msg.value-realPrize);
-		ticketsSold += howManyTickets;
+		jackpot += msg.value;
+		ticketsSold += 1;
 		return howManyTickets;
 	}
 
 	function random() private view returns (uint) {
-		return uint(keccak256(block.difficulty, now, players));
+       return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players.length)));
 	}
 
-	function getJackpot() public constant returns (uint) {
+	function getJackpot() public view returns (uint) {
 		return jackpot;
 	}
 
-	function getTicketSold() public constant returns (uint) {
+	function getTicketSold() public view returns (uint) {
 		return ticketsSold;
 	}
 
 	function endLottery () public payable {
-		require (now > lotteryEndTime);
+		require (block.timestamp > lotteryEndTime);
 	 	uint index = random() % players.length;
-	 	LotteryWinnerSet(players[index], jackpot);
+	 	emit LotteryWinnerSet(players[index], jackpot);
 		if(players[index].send(jackpot)) {
 		} else {
 			revert();
