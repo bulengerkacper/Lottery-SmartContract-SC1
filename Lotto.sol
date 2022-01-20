@@ -9,37 +9,39 @@ contract TDL {
 	uint public ticketsSold;
 	uint public lotteryEndTime;
 	address payable[] public players;
-    address public owner;
+	address public owner;
 
 	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
 
 	constructor(uint _whenEnd, uint64 _ticketPrize) {
-        // convert_to_days=12*60*60*_whenEnd
+		// convert_to_days=12*60*60*_whenEnd
 		lotteryEndTime = block.timestamp + _whenEnd;
 		ticketPrize = _ticketPrize;
-        owner=msg.sender;
+		owner=msg.sender;
 	}
 
 	receive() external payable {
-		require (block.timestamp <= lotteryEndTime);
-		require (msg.value == ticketPrize);
-	    players.push(payable(msg.sender));
+		require (block.timestamp <= lotteryEndTime, "After lottery time");
+		require (msg.value == ticketPrize, "It requires same amount as given in the constructor");
+		players.push(payable(msg.sender));
 		jackpot += msg.value;
 		ticketsSold += 1;
 	}
 
 	function random() private view returns (uint) {
-       return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players.length)));
+		return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players.length)));
 	}
 
-    function getJackpot() public view returns (uint) {
-        return address(this).balance;
-    }
+	function getJackpot() public view returns (uint) {
+		return address(this).balance;
+	}
 
 	function endLottery () public{
+		require (players.length>1);
 		require (block.timestamp > lotteryEndTime);
 	 	uint index = random() % players.length;
-        players[index].transfer(address(this).balance);
+		players[index].transfer(address(this).balance);
 	 	emit LotteryWinnerSet(players[index], jackpot);
+		delete players;
 	}
 }
