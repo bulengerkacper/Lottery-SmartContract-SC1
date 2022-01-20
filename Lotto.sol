@@ -5,7 +5,7 @@ pragma solidity ^0.8.11;
 contract TDL {
 
 	uint64 public ticketPrize;
-	uint private jackpot;
+	uint public jackpot;
 	uint public ticketsSold;
 	uint public lotteryEndTime;
 	address payable[] public players;
@@ -14,34 +14,22 @@ contract TDL {
 	event LotteryWinnerSet(address accountAddress, uint jackpotAmount);
 
 	constructor(uint _whenEnd, uint64 _ticketPrize) {
+        // convert_to_days=12*60*60*_whenEnd
 		lotteryEndTime = block.timestamp + _whenEnd;
 		ticketPrize = _ticketPrize;
         owner=msg.sender;
 	}
 
-	function buyTicket() public payable returns (uint) {
+	receive() external payable {
 		require (block.timestamp <= lotteryEndTime);
-		require (msg.value >= ticketPrize);
-	
-		uint howManyTickets = msg.value/ticketPrize;
-		for(uint counter = 0; counter < howManyTickets; counter++) {
-			players.push(payable(msg.sender));
-		}
+		require (msg.value == ticketPrize);
+	    players.push(payable(msg.sender));
 		jackpot += msg.value;
 		ticketsSold += 1;
-		return howManyTickets;
 	}
 
 	function random() private view returns (uint) {
        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players.length)));
-	}
-
-	function getJackpot() public view returns (uint) {
-		return jackpot;
-	}
-
-	function getTicketSold() public view returns (uint) {
-		return ticketsSold;
 	}
 
 	function endLottery () public payable {
