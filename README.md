@@ -1,12 +1,12 @@
 
-####Lottery smart contract
+#### Lottery smart contract
 
-##Rules:
+## Rules:
 -tickets are accepted at a specific time
 -one transaction - one ticket
 
 
-##Deployment:
+## Deployment:
 Construtor with 2 parameters:
 -lottery ticket price
 -end of lottery (seconds from deployment to the end)
